@@ -1,0 +1,31 @@
+{
+  "name": "nest-ts-gen",
+  "version": "1.0.0",
+  "description": "generate nest files and .d.ts files by one mapping file",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/p-lay/nest-ts-gen.git"
+  },
+  "keywords": [
+    "nest",
+    "ts",
+    "gen",
+    ".d.ts",
+    "generator"
+  ],
+  "author": "Matthew5",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/p-lay/nest-ts-gen/issues"
+  },
+  "homepage": "https://github.com/p-lay/nest-ts-gen#readme",
+  "dependencies": {
+    "@types/node": "^12.0.12",
+    "ts-node": "^8.3.0",
+    "typescript": "^3.5.2"
+  }
+}
