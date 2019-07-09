@@ -1,2 +1,6 @@
 node_modules
 dist
+type
+module
+controller
+service
