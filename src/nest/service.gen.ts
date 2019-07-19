@@ -1,11 +1,11 @@
 import * as fs from "fs"
-import { BaseRender } from "../baseRender"
-import { Service } from "../type/global"
+import { BaseRender, ModelConfig } from "../baseRender"
+import { Method } from "../type/global"
 
 type Param = {
-  mapping: any
-  key: string
-  generatorConfig: any
+  model: any
+  modelKey: string
+  mappingConfig: any
 }
 
 type Config = {
@@ -15,27 +15,23 @@ type Config = {
   outFolder: string
 }
 
-type ServiceConfig = {
-  disableEntity: boolean
-}
-
 export class ServiceGen extends BaseRender {
   constructor(param: Param, config: Config) {
     super()
-    const { _config, ...serviceMapping } = param.mapping
-    this.key = param.key
-    this.serviceMapping = serviceMapping
-    this.serviceConfig = _config || {}
-    this.generatorConfig = param.generatorConfig
+    const { _config, ...model } = param.model
+    this.modelKey = param.modelKey
+    this.model = model
+    this.modelConfig = _config || {}
+    this.mappingConfig = param.mappingConfig
     this.config = config
   }
-  key: string
-  serviceMapping: any
-  serviceConfig: ServiceConfig
+  modelKey: string
+  model: any
+  modelConfig: ModelConfig
   config: Config
 
   get prefixKey() {
-    return this.upperFirstLetter(this.key)
+    return this.upperFirstLetter(this.modelKey)
   }
   get className() {
     return `${this.prefixKey}Service`
@@ -43,46 +39,46 @@ export class ServiceGen extends BaseRender {
   get entityName() {
     return `${this.prefixKey}Entity`
   }
-  get allContractTypes(): string[] {
+  get allDtoTypes(): string[] {
     const result = []
-    for (const serviceKey in this.serviceMapping) {
-      const service: Service = this.serviceMapping[serviceKey]
-      const types = this.getServiceContractTypes(service)
+    for (const methodKey in this.model) {
+      const method: Method = this.model[methodKey]
+      const types = this.getDtoTypes(method)
       result.push(...types)
     }
     return result
   }
 
-  getServiceContractTypes(service: Service) {
+  getDtoTypes(method: Method) {
     function getType(str: string) {
       if (str && str.toLowerCase() != "any" && str.toLowerCase() != "object") {
         return str
       }
     }
 
-    const reqType = getType(service.req)
-    const resType = getType(service.res)
+    const reqType = getType(method.req)
+    const resType = getType(method.res)
     return [reqType, resType].filter(x => !!x)
   }
 
   renderEntityImports() {
-    if (this.serviceConfig.disableEntity) {
+    if (this.modelConfig.disableEntity) {
       return ""
     } else {
       return `\nimport { InjectRepository } from '@nestjs/typeorm'\nimport { Repository } from 'typeorm'\nimport { ${
         this.entityName
-      } } from '../${this.config.entityFolderName}/${this.key}.entity'`
+      } } from '../${this.config.entityFolderName}/${this.modelKey}.entity'`
     }
   }
 
   renderImports() {
-    return `import { Injectable, Inject } from '@nestjs/common'\nimport { ${this.allContractTypes.join(", ")} } from '../${
+    return `import { Injectable, Inject } from '@nestjs/common'\nimport { ${this.allDtoTypes.join(", ")} } from '../${
       this.config.contractFolderName
-    }/${this.key}'${this.renderEntityImports()}`
+    }/${this.modelKey}'${this.renderEntityImports()}`
   }
 
   renderConstructor() {
-    if (this.serviceConfig.disableEntity) {
+    if (this.modelConfig.disableEntity) {
       return `constructor() {}`
     } else {
       return `constructor(${this.addLine(2)}@InjectRepository(${
@@ -97,22 +93,22 @@ export class ServiceGen extends BaseRender {
     const decorator = this.renderClassDecorator()
     return `${decorator}\nexport class ${this.className} {${this.addLine(
       1
-    )}${this.renderConstructor()}\n${this.renderServices()}\n}`
+    )}${this.renderConstructor()}\n${this.renderMethods()}\n}`
   }
 
-  renderServices() {
-    let serviceStr = ""
-    for (const serviceKey in this.serviceMapping) {
-      serviceStr +=
-        this.renderService(serviceKey, this.serviceMapping[serviceKey]) + "\r"
+  renderMethods() {
+    let methodStr = ""
+    for (const methodKey in this.model) {
+      methodStr +=
+        this.renderMethod(methodKey, this.model[methodKey]) + "\r"
     }
-    return serviceStr
+    return methodStr
   }
 
-  renderService(serviceKey: string, service: Service) {
-    return `${this.addLine(1)}async ${serviceKey}(param: ${this.getRequestType(
-      service.req
-    )}): ${this.getServiceResponseType(service.res)} {${this.addLine(2)}return null${this.addLine(1)}}`
+  renderMethod(methodKey: string, method: Method) {
+    return `${this.addLine(1)}async ${methodKey}(param: ${this.getRequestType(
+      method.req
+    )}): ${this.getServiceResponseType(method.res)} {${this.addLine(2)}return null${this.addLine(1)}}`
   }
 
   renderClassDecorator() {
@@ -125,6 +121,6 @@ export class ServiceGen extends BaseRender {
 
   public generate() {
     const str = this.render()
-    fs.writeFileSync(`${this.config.outFolder}/${this.key}.service.ts`, str)
+    fs.writeFileSync(`${this.config.outFolder}/${this.modelKey}.service.ts`, str)
   }
 }

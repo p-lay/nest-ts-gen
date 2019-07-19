@@ -17,7 +17,7 @@ export class ContractGen extends BaseRender {
     super()
     const { _config, ...mapping } = param.mapping
     this.mapping = mapping
-    this.generatorConfig = _config
+    this.mappingConfig = _config
     this.outFolder = param.outFolder
     const paramConfig = param.config || {}
     this.config = { ...this.defaultConfig, ...paramConfig }
@@ -31,43 +31,43 @@ export class ContractGen extends BaseRender {
   config: Partial<Config>
 
   private renderMappingType() {
-    return `type Mapping = {${this.renderControllers()}\r}`
+    return `type Mapping = {${this.renderModels()}\r}`
   }
 
-  private renderControllers() {
-    let controllerStr = ""
-    for (const controllerKey in this.mapping) {
-      controllerStr += `${this.addLine(
+  private renderModels() {
+    let modelStr = ""
+    for (const modelKey in this.mapping) {
+      modelStr += `${this.addLine(
         1
-      )}${controllerKey}: {${this.renderServices(
-        this.mapping[controllerKey]
+      )}${modelKey}: {${this.renderMethods(
+        this.mapping[modelKey]
       )}${this.addLine(1)}}`
     }
-    return controllerStr
+    return modelStr
   }
 
-  private renderServices(mapping: any) {
-    const { _config, ...serviceMapping } = mapping
-    let serviceStr = ""
-    for (const serviceKey in serviceMapping) {
-      serviceStr += `${this.addLine(2)}${serviceKey}: {${this.renderDtos(
-        serviceMapping[serviceKey]
+  private renderMethods(mapping: any) {
+    const { _config, ...model } = mapping
+    let methodStr = ""
+    for (const methodKey in model) {
+      methodStr += `${this.addLine(2)}${methodKey}: {${this.renderMethod(
+        model[methodKey]
       )}${this.addLine(2)}}`
     }
-    return serviceStr
+    return methodStr
   }
 
-  private renderDtos(mapping: any) {
-    const { _config, ...dtoMapping } = mapping
+  private renderMethod(mapping: any) {
+    const { _config, ...method } = mapping
     let dtoStr = ""
-    const keys = Object.keys(dtoMapping)
-    let reqTypeStr = dtoMapping.req
+    const keys = Object.keys(method)
+    let reqTypeStr = method.req
     if (!reqTypeStr || !keys.includes("req")) {
       reqTypeStr = "any"
     }
     dtoStr += `${this.addLine(3)}req: ${reqTypeStr}`
 
-    const resType = dtoMapping.res
+    const resType = method.res
     let resTypeStr = resType
     if (!resTypeStr || !keys.includes("res")) {
       resTypeStr = "any"

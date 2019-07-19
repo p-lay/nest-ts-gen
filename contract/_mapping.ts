@@ -6,19 +6,24 @@ export default {
     addVue: {
       req: "AddVueReq",
       res: "any",
-      _config: {
-        req: "AddVueReq",
-        res: "any"
-      }
     },
     getVue: {
       req: "GetVueReq",
       res: "GetVueRes"
     }
   },
-  qiniu: {
+  noEntity: {
     _config: {
       disableEntity: true
+    },
+    getQiniuToken: {
+      req: "", // default
+      res: "GetQiniuTokenRes"
+    }
+  },
+  noController: {
+    _config: {
+      disableController: true
     },
     getQiniuToken: {
       req: "", // default

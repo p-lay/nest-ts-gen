@@ -1,9 +1,14 @@
-export type GeneratorConfig = {
+export type MappingConfig = {
   promiseGenericRes: string
 }
 
+export type ModelConfig = {
+  disableEntity: boolean
+  disableController: boolean
+}
+
 export class BaseRender {
-  generatorConfig: GeneratorConfig
+  mappingConfig: MappingConfig
 
   addLine(tabCount?: number) {
     let space = ""
@@ -19,7 +24,7 @@ export class BaseRender {
   }
 
   get commonResType() {
-    return this.generatorConfig.promiseGenericRes
+    return this.mappingConfig.promiseGenericRes
   }
 
   get globalTypeFileName() {
@@ -34,7 +39,7 @@ export class BaseRender {
     }
   }
 
-  getResponseType(str: string) {
+  getControllerResponseType(str: string) {
     if (!str || str == "any" || str.toLowerCase() == "object") {
       return this.commonResType
     } else {

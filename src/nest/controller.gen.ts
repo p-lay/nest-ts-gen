@@ -1,6 +1,6 @@
 import * as fs from "fs"
 import { BaseRender } from "../baseRender"
-import { Service } from "../type/global"
+import { Method } from "../type/global"
 import { ServiceGen } from "./service.gen"
 
 type Param = {
@@ -19,17 +19,17 @@ type Config = {
 export class ControllerGen extends BaseRender {
   constructor(param: Param, config: Config) {
     super()
-    const { _config, ...controllerMapping } = param.mapping
-    this.mapping = controllerMapping
-    this.generatorConfig = _config || {}
+    const { _config, ...mapping } = param.mapping
+    this.mapping = mapping
+    this.mappingConfig = _config || {}
     this.config = config
   }
-  key: string
+  modelKey: string
   mapping: any
   config: Config
 
   get prefixKey() {
-    return this.upperFirstLetter(this.key)
+    return this.upperFirstLetter(this.modelKey)
   }
   get className() {
     return `${this.prefixKey}Controller`
@@ -37,26 +37,26 @@ export class ControllerGen extends BaseRender {
   get serviceName() {
     return `${this.prefixKey}Service`
   }
-  get allContractTypes(): string[] {
+  get allDtoTypes(): string[] {
     const result = []
-    const services = this.mapping[this.key]
-    for (const key in services) {
-      const service: Service = services[key]
-      const types = this.getServiceContractTypes(service)
+    const model = this.mapping[this.modelKey]
+    for (const key in model) {
+      const method: Method = model[key]
+      const types = this.getDtoTypes(method)
       result.push(...types)
     }
     return result
   }
 
-  getServiceContractTypes(service: Service) {
+  getDtoTypes(method: Method) {
     function getType(str: string) {
       if (str && str.toLowerCase() != "any" && str.toLowerCase() != "object") {
         return str
       }
     }
 
-    const reqType = getType(service.req)
-    const resType = getType(service.res)
+    const reqType = getType(method.req)
+    const resType = getType(method.res)
     return [reqType, resType].filter(x => !!x)
   }
 
@@ -64,12 +64,12 @@ export class ControllerGen extends BaseRender {
     return `import { Controller, Get, Post, Body, Req, Res } from '@nestjs/common'\nimport { ${
       this.serviceName
     } } from '../${this.config.serviceFolderName}/${
-      this.key
+      this.modelKey
     }.service'\nimport { ${this.commonResType} } from '../${
       this.config.contractFolderName
-    }/${this.globalTypeFileName}'\nimport { ${this.allContractTypes.join(
+    }/${this.globalTypeFileName}'\nimport { ${this.allDtoTypes.join(
       ", "
-    )} } from '../${this.config.contractFolderName}/${this.key}'`
+    )} } from '../${this.config.contractFolderName}/${this.modelKey}'`
   }
 
   renderClass() {
@@ -78,25 +78,25 @@ export class ControllerGen extends BaseRender {
       1
     )}constructor(private readonly service: ${
       this.serviceName
-    }) {}${this.addLine(1)}${this.renderServices()}\n}`
+    }) {}${this.addLine(1)}${this.renderMethods()}\n}`
   }
 
-  renderServices() {
-    let serviceStr = ""
-    const { _config, ...serviceMapping } = this.mapping[this.key]
-    for (const serviceKey in serviceMapping) {
-      serviceStr +=
-        this.renderService(serviceKey, serviceMapping[serviceKey]) + "\r"
+  renderMethods() {
+    let methodStr = ""
+    const { _config, ...model } = this.mapping[this.modelKey]
+    for (const methodKey in model) {
+      methodStr +=
+        this.renderMethod(methodKey, model[methodKey]) + "\r"
     }
-    return serviceStr
+    return methodStr
   }
 
-  renderService(key: string, service: Service) {
+  renderMethod(key: string, method: Method) {
     return `${this.addLine(1)}@Post('${key}')${this.addLine(
       1
     )}async ${key}(@Body() param: ${this.getRequestType(
-      service.req
-    )}): ${this.getResponseType(service.res)} {${this.addLine(
+      method.req
+    )}): ${this.getControllerResponseType(method.res)} {${this.addLine(
       2
     )}const data = await this.service.${key}(param)${this.addLine(
       2
@@ -112,19 +112,23 @@ export class ControllerGen extends BaseRender {
   }
 
   public generate() {
-    for (const key in this.mapping) {
-      this.key = key
-      const str = this.render()
-      fs.writeFileSync(
-        `${this.config.controllerOutFolder}/${key}.controller.ts`,
-        str
-      )
+    for (const modelKey in this.mapping) {
+      const model = this.mapping[modelKey]
+      const disableController = model._config && model._config.disableController
+      if (!disableController) {
+        this.modelKey = modelKey
+        const str = this.render()
+        fs.writeFileSync(
+          `${this.config.controllerOutFolder}/${modelKey}.controller.ts`,
+          str
+        )
+      }
 
       new ServiceGen(
         {
-          key,
-          mapping: this.mapping[key],
-          generatorConfig: this.generatorConfig
+          modelKey,
+          model,
+          mappingConfig: this.mappingConfig
         },
         {
           serviceFolderName: this.config.serviceFolderName,
