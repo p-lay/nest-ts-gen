@@ -1,17 +1,27 @@
 export default {
-  Vue: {
+  _config: {
+    promiseGenericRes: "CommonRes"
+  },
+  vue: {
+    _config: {
+      entity: false
+    },
     addVue: {
       req: "AddVueReq",
-      res: "any"
+      res: "any",
+      _config: {
+        req: "AddVueReq",
+        res: "any"
+      }
     },
     getVue: {
       req: "GetVueReq",
       res: "GetVueRes"
     }
   },
-  Qiniu: {
+  qiniu: {
     getQiniuToken: {
-      req: "",
+      req: "", // default
       res: "GetQiniuTokenRes"
     }
   }

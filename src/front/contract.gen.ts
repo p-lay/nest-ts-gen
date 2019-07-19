@@ -1,10 +1,9 @@
 import * as fs from "fs"
+import { BaseRender } from "../baseRender"
 
 type Config = {
   outFileName: string
   typeName: string
-  tabWidth: number
-  singleQuote: boolean
 }
 
 type Param = {
@@ -13,30 +12,24 @@ type Param = {
   config?: Partial<Config>
 }
 
-export class ContractGen {
+export class ContractGen extends BaseRender {
   constructor(param: Param) {
+    super()
     this.mapping = param.mapping
     this.outFolder = param.outFolder
     const paramConfig = param.config || {}
     this.config = { ...this.defaultConfig, ...paramConfig }
+    this.defaultType =
+      (this.mapping._config && this.mapping._config.defaultType) || `{}`
   }
   mapping: any
   outFolder: string
-  defaultConfig: Config = {
+  defaultConfig: Partial<Config> = {
     outFileName: "mapping.d.ts",
-    typeName: "ContractType",
-    tabWidth: 2,
-    singleQuote: true
+    typeName: "ContractType"
   }
   config: Partial<Config>
-
-  private addLine(tabCount: number) {
-    let space = ""
-    for (let index = 0; index < this.config.tabWidth * tabCount; index++) {
-      space += " "
-    }
-    return `\r${space}`
-  }
+  defaultType: string
 
   private renderMappingType() {
     return `type Mapping = {${this.renderControllers()}\r}`
@@ -45,6 +38,8 @@ export class ContractGen {
   private renderControllers() {
     let controllerStr = ""
     for (const controller of Object.keys(this.mapping)) {
+      if (this.isInnerKey(controller)) continue
+
       controllerStr += `${this.addLine(1)}${controller}: {${this.renderServices(
         this.mapping[controller]
       )}${this.addLine(1)}}`
@@ -55,8 +50,10 @@ export class ContractGen {
   private renderServices(services: any) {
     let serviceStr = ""
     for (const service of Object.keys(services)) {
+      if (this.isInnerKey(service)) continue
+
       serviceStr += `${this.addLine(2)}${service}: {${this.renderDtos(
-        services[service as any]
+        services[service]
       )}${this.addLine(2)}}`
     }
     return serviceStr
@@ -65,9 +62,11 @@ export class ContractGen {
   private renderDtos(dtos: any) {
     let dtoStr = ""
     for (const dto of Object.keys(dtos)) {
-      let dtoValue = dtos[dto as any]
+      if (this.isInnerKey(dto)) continue
+
+      let dtoValue = dtos[dto]
       if (!dtoValue) {
-        dtoValue = "{}"
+        dtoValue = this.defaultType
       }
       dtoStr += `${this.addLine(3)}${dto}: ${dtoValue}`
     }
@@ -75,10 +74,9 @@ export class ContractGen {
   }
 
   private renderContractType() {
-    const quote = this.config.singleQuote ? `'` : `"`
-    const controllers = Object.keys(this.mapping).map(
-      controller => `Mapping[${quote + controller + quote}]`
-    )
+    const controllers = Object.keys(this.mapping)
+      .filter(x => !this.isInnerKey(x))
+      .map(controller => `Mapping['${controller}']`)
     return `type ${this.config.typeName} = ${controllers.join(" & ")}`
   }
 

@@ -1,6 +1,6 @@
 import * as fs from "fs"
 
-export class DefinitionReplace {
+export class DefinitionGen {
   constructor(
     sourceFolder: string,
     outFolder: string,
@@ -15,7 +15,7 @@ export class DefinitionReplace {
   excludePrefixs: string[]
   defaultExcludePrefixs: string[] = ["_"]
 
-  public replace() {
+  public generate() {
     const fileNames = fs
       .readdirSync(this.sourceFolder)
       .filter(x => !this.excludePrefixs.includes(x[0]))

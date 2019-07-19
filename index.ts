@@ -1,9 +1,31 @@
 import mapping from "./contract/_mapping"
-import { ContractGen } from "./util/.d.ts/contract.gen"
-import { DefinitionReplace } from "./util/.d.ts/definition.replace"
+import { join } from "path"
+import { ContractGen } from "./src/front/contract.gen"
+import { DefinitionGen } from "./src/front/definition.gen"
+import { ControllerGen } from "./src/nest/controller.gen"
 
-const sourceFolder = __dirname + "/contract"
-const outFolder = __dirname + "/type"
+const rootFolderPath = __dirname
+// front-end
+const contractFolderName = "contract"
+const typeFolderName = "type"
+// back-end
+const controllerFolderName = "controller"
+const serviceFolderName = "service"
+const moduleFolderName = "module"
 
-new ContractGen({ mapping, outFolder }).generate()
-new DefinitionReplace(sourceFolder, outFolder).replace()
+// new ContractGen({
+//   mapping,
+//   outFolder: join(rootFolderPath, typeFolderName)
+// }).generate()
+
+// new DefinitionGen(
+//   join(rootFolderPath, contractFolderName),
+//   join(rootFolderPath, typeFolderName)
+// ).generate()
+
+new ControllerGen({
+  mapping,
+  serviceFolderName,
+  contractFolderName,
+  outFolder: join(rootFolderPath, controllerFolderName)
+}).generate()
