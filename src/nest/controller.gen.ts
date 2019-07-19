@@ -1,43 +1,46 @@
 import * as fs from "fs"
 import { BaseRender } from "../baseRender"
 import { Service } from "../type/global"
+import { ServiceGen } from "./service.gen"
 
 type Param = {
   mapping: any
+}
+
+type Config = {
   serviceFolderName: string
   contractFolderName: string
-  outFolder: string
+  controllerOutFolder: string
+  // for serviceGen
+  serviceOutFolder: string
+  entityFolderName: string
 }
 
 export class ControllerGen extends BaseRender {
-  constructor(param: Param) {
+  constructor(param: Param, config: Config) {
     super()
-    this.mapping = param.mapping
-    this.serviceFolderName = param.serviceFolderName
-    this.contractFolderName = param.contractFolderName
-    this.outFolder = param.outFolder
+    const { _config, ...controllerMapping } = param.mapping
+    this.mapping = controllerMapping
+    this.generatorConfig = _config
+    this.config = config
   }
   key: string
   mapping: any
-  serviceFolderName: string
-  contractFolderName: string
-  outFolder: string
+  config: Config
 
-  get controllerPrefix() {
+  get prefixKey() {
     return this.upperFirstLetter(this.key)
   }
   get className() {
-    return `${this.controllerPrefix}Controller`
+    return `${this.prefixKey}Controller`
   }
   get serviceName() {
-    return `${this.controllerPrefix}Service`
+    return `${this.prefixKey}Service`
   }
   get allContractTypes(): string[] {
     const result = []
     const services = this.mapping[this.key]
     for (const key in services) {
-      if (this.isInnerKey(key)) continue
-
       const service: Service = services[key]
       const types = this.getServiceContractTypes(service)
       result.push(...types)
@@ -60,13 +63,13 @@ export class ControllerGen extends BaseRender {
   renderImports() {
     return `import { Controller, Get, Post, Body, Req, Res } from '@nestjs/common'\nimport { ${
       this.serviceName
-    } } from '../${this.serviceFolderName}/${this.key}.service'\nimport { ${
-      this.commonResType
-    } } from '../${this.contractFolderName}/${
-      this.globalTypeFileName
-    }'\nimport { ${this.allContractTypes.join(", ")} } from '../${
-      this.contractFolderName
-    }/${this.key}'`
+    } } from '../${this.config.serviceFolderName}/${
+      this.key
+    }.service'\nimport { ${this.commonResType} } from '../${
+      this.config.contractFolderName
+    }/${this.globalTypeFileName}'\nimport { ${this.allContractTypes.join(
+      ", "
+    )} } from '../${this.config.contractFolderName}/${this.key}'`
   }
 
   renderClass() {
@@ -82,8 +85,6 @@ export class ControllerGen extends BaseRender {
     let serviceStr = ""
     const services = this.mapping[this.key]
     for (const key in services) {
-      if (this.isInnerKey(key)) continue
-
       serviceStr += this.renderService(key, services[key]) + "\r"
     }
     return serviceStr
@@ -111,11 +112,23 @@ export class ControllerGen extends BaseRender {
 
   public generate() {
     for (const key in this.mapping) {
-      if (this.isInnerKey(key)) continue
-
       this.key = key
       const str = this.render()
-      fs.writeFileSync(`${this.outFolder}/${key}.controller.ts`, str + "\n")
+      fs.writeFileSync(
+        `${this.config.controllerOutFolder}/${key}.controller.ts`,
+        str
+      )
+
+      const { _config, serviceMapping } = this.mapping[key]
+      new ServiceGen(
+        { key, serviceMapping, generatorConfig: this.generatorConfig, serviceConfig: _config },
+        {
+          serviceFolderName: this.config.serviceFolderName,
+          contractFolderName: this.config.contractFolderName,
+          outFolder: this.config.serviceOutFolder,
+          entityFolderName: this.config.entityFolderName
+        }
+      ).generate()
     }
   }
 }

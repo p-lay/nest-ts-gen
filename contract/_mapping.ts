@@ -3,9 +3,6 @@ export default {
     promiseGenericRes: "CommonRes"
   },
   vue: {
-    _config: {
-      entity: false
-    },
     addVue: {
       req: "AddVueReq",
       res: "any",
@@ -20,6 +17,9 @@ export default {
     }
   },
   qiniu: {
+    _config: {
+      disableEntity: true
+    },
     getQiniuToken: {
       req: "", // default
       res: "GetQiniuTokenRes"

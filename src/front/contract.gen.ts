@@ -15,12 +15,12 @@ type Param = {
 export class ContractGen extends BaseRender {
   constructor(param: Param) {
     super()
-    this.mapping = param.mapping
+    const { _config, ...mapping } = param.mapping
+    this.mapping = mapping
+    this.generatorConfig = _config
     this.outFolder = param.outFolder
     const paramConfig = param.config || {}
     this.config = { ...this.defaultConfig, ...paramConfig }
-    this.defaultType =
-      (this.mapping._config && this.mapping._config.defaultType) || `{}`
   }
   mapping: any
   outFolder: string
@@ -29,7 +29,6 @@ export class ContractGen extends BaseRender {
     typeName: "ContractType"
   }
   config: Partial<Config>
-  defaultType: string
 
   private renderMappingType() {
     return `type Mapping = {${this.renderControllers()}\r}`
@@ -37,46 +36,53 @@ export class ContractGen extends BaseRender {
 
   private renderControllers() {
     let controllerStr = ""
-    for (const controller of Object.keys(this.mapping)) {
-      if (this.isInnerKey(controller)) continue
-
-      controllerStr += `${this.addLine(1)}${controller}: {${this.renderServices(
-        this.mapping[controller]
+    for (const controllerKey in this.mapping) {
+      controllerStr += `${this.addLine(
+        1
+      )}${controllerKey}: {${this.renderServices(
+        this.mapping[controllerKey]
       )}${this.addLine(1)}}`
     }
     return controllerStr
   }
 
-  private renderServices(services: any) {
+  private renderServices(mapping: any) {
+    const { _config, ...serviceMapping } = mapping
     let serviceStr = ""
-    for (const service of Object.keys(services)) {
-      if (this.isInnerKey(service)) continue
-
-      serviceStr += `${this.addLine(2)}${service}: {${this.renderDtos(
-        services[service]
+    for (const serviceKey in serviceMapping) {
+      serviceStr += `${this.addLine(2)}${serviceKey}: {${this.renderDtos(
+        serviceMapping[serviceKey]
       )}${this.addLine(2)}}`
     }
     return serviceStr
   }
 
-  private renderDtos(dtos: any) {
+  private renderDtos(mapping: any) {
+    const { _config, ...dtoMapping } = mapping
     let dtoStr = ""
-    for (const dto of Object.keys(dtos)) {
-      if (this.isInnerKey(dto)) continue
-
-      let dtoValue = dtos[dto]
-      if (!dtoValue) {
-        dtoValue = this.defaultType
-      }
-      dtoStr += `${this.addLine(3)}${dto}: ${dtoValue}`
+    const keys = Object.keys(dtoMapping)
+    let reqTypeStr = dtoMapping.req
+    if (!reqTypeStr || !keys.includes("req")) {
+      reqTypeStr = "any"
     }
+    dtoStr += `${this.addLine(3)}req: ${reqTypeStr}`
+
+    const resType = dtoMapping.res
+    let resTypeStr = resType
+    if (!resTypeStr || !keys.includes("res")) {
+      resTypeStr = "any"
+    } else {
+      resTypeStr = `${resTypeStr}`
+    }
+    dtoStr += `${this.addLine(3)}res: ${resTypeStr}`
+
     return dtoStr
   }
 
   private renderContractType() {
-    const controllers = Object.keys(this.mapping)
-      .filter(x => !this.isInnerKey(x))
-      .map(controller => `Mapping['${controller}']`)
+    const controllers = Object.keys(this.mapping).map(
+      controller => `Mapping['${controller}']`
+    )
     return `type ${this.config.typeName} = ${controllers.join(" & ")}`
   }
 

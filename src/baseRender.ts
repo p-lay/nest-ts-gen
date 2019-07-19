@@ -1,4 +1,10 @@
+export type GeneratorConfig = {
+  promiseGenericRes: string
+}
+
 export class BaseRender {
+  generatorConfig: GeneratorConfig
+
   addLine(tabCount?: number) {
     let space = ""
     for (let index = 0; index < 2 * tabCount; index++) {
@@ -7,17 +13,13 @@ export class BaseRender {
     return `\r${space}`
   }
 
-  isInnerKey(key: string) {
-    return ["_config"].includes(key)
-  }
-
   upperFirstLetter(str: string) {
     const firstLetter = str.charAt(0)
     return str.replace(firstLetter, firstLetter.toUpperCase())
   }
 
   get commonResType() {
-    return "CommonRes"
+    return this.generatorConfig.promiseGenericRes
   }
 
   get globalTypeFileName() {
@@ -37,6 +39,14 @@ export class BaseRender {
       return this.commonResType
     } else {
       return `${this.commonResType}<${str}>`
+    }
+  }
+
+  getServiceResponseType(str: string) {
+    if (!str || str == "any" || str.toLowerCase() == "object") {
+      return "Promise<any>"
+    } else {
+      return `Promise<${str}>`
     }
   }
 }

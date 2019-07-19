@@ -11,21 +11,29 @@ const typeFolderName = "type"
 // back-end
 const controllerFolderName = "controller"
 const serviceFolderName = "service"
+const entityFolderName = "entity"
 const moduleFolderName = "module"
 
-// new ContractGen({
-//   mapping,
-//   outFolder: join(rootFolderPath, typeFolderName)
-// }).generate()
-
-// new DefinitionGen(
-//   join(rootFolderPath, contractFolderName),
-//   join(rootFolderPath, typeFolderName)
-// ).generate()
-
-new ControllerGen({
+new ContractGen({
   mapping,
-  serviceFolderName,
-  contractFolderName,
-  outFolder: join(rootFolderPath, controllerFolderName)
+  outFolder: join(rootFolderPath, typeFolderName)
 }).generate()
+
+new DefinitionGen(
+  join(rootFolderPath, contractFolderName),
+  join(rootFolderPath, typeFolderName)
+).generate()
+
+new ControllerGen(
+  {
+    mapping
+  },
+  {
+    serviceFolderName,
+    contractFolderName,
+    controllerOutFolder: join(rootFolderPath, controllerFolderName),
+    // for serviceGen
+    serviceOutFolder: join(rootFolderPath, serviceFolderName),
+    entityFolderName
+  }
+).generate()
