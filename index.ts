@@ -37,3 +37,5 @@ new ControllerGen(
     entityFolderName
   }
 ).generate()
+
+console.log("finish")

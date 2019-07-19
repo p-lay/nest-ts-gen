@@ -3,9 +3,8 @@ import { BaseRender } from "../baseRender"
 import { Service } from "../type/global"
 
 type Param = {
-  serviceMapping: any
+  mapping: any
   key: string
-  serviceConfig: any
   generatorConfig: any
 }
 
@@ -23,9 +22,10 @@ type ServiceConfig = {
 export class ServiceGen extends BaseRender {
   constructor(param: Param, config: Config) {
     super()
+    const { _config, ...serviceMapping } = param.mapping
     this.key = param.key
-    this.serviceMapping = param.serviceMapping
-    this.serviceConfig = param.serviceConfig
+    this.serviceMapping = serviceMapping
+    this.serviceConfig = _config || {}
     this.generatorConfig = param.generatorConfig
     this.config = config
   }
@@ -45,9 +45,8 @@ export class ServiceGen extends BaseRender {
   }
   get allContractTypes(): string[] {
     const result = []
-    const services = this.serviceMapping[this.key]
-    for (const key in services) {
-      const service: Service = services[key]
+    for (const serviceKey in this.serviceMapping) {
+      const service: Service = this.serviceMapping[serviceKey]
       const types = this.getServiceContractTypes(service)
       result.push(...types)
     }
@@ -66,44 +65,21 @@ export class ServiceGen extends BaseRender {
     return [reqType, resType].filter(x => !!x)
   }
 
-  //   import { Injectable, Inject } from '@nestjs/common'
-  // import { InjectRepository } from '@nestjs/typeorm'
-  // import { Repository } from 'typeorm'
-  // import { VueEntity } from '../entity/vue.entity'
-  // import { ResourceService } from './resource.service'
-  // import { AddVueReq, UpdateVueReq, GetVueReq, GetVueRes } from '../contract/vue'
-
   renderEntityImports() {
     if (this.serviceConfig.disableEntity) {
       return ""
     } else {
-      return `\nimport { Repository } from 'typeorm'\nimport { ${
+      return `\nimport { InjectRepository } from '@nestjs/typeorm'\nimport { Repository } from 'typeorm'\nimport { ${
         this.entityName
       } } from '../${this.config.entityFolderName}/${this.key}.entity'`
     }
   }
 
   renderImports() {
-    return `import { Injectable, Inject } from '@nestjs/common'\nimport { InjectRepository } from '@nestjs/typeorm'\nimport { ${
-      this.commonResType
-    } } from '../${this.config.contractFolderName}/${
-      this.globalTypeFileName
-    }'\nimport { ${this.allContractTypes.join(", ")} } from '../${
+    return `import { Injectable, Inject } from '@nestjs/common'\nimport { ${this.allContractTypes.join(", ")} } from '../${
       this.config.contractFolderName
     }/${this.key}'${this.renderEntityImports()}`
   }
-
-  // @Injectable()
-  // export class VueService {
-  // constructor(
-  //   @InjectRepository(VueEntity)
-  //   readonly vueRepo: Repository<VueEntity>,
-  //   @Inject(ResourceService)
-  //   private readonly resourceService: ResourceService,
-  // ) {}
-
-  // async addVue(param: AddVueReq) {
-  // }
 
   renderConstructor() {
     if (this.serviceConfig.disableEntity) {
@@ -136,7 +112,7 @@ export class ServiceGen extends BaseRender {
   renderService(serviceKey: string, service: Service) {
     return `${this.addLine(1)}async ${serviceKey}(param: ${this.getRequestType(
       service.req
-    )}): Promise<${this.getServiceResponseType(service.res)}> {${this.addLine(1)}}`
+    )}): ${this.getServiceResponseType(service.res)} {${this.addLine(2)}return null${this.addLine(1)}}`
   }
 
   renderClassDecorator() {

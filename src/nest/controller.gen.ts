@@ -21,7 +21,7 @@ export class ControllerGen extends BaseRender {
     super()
     const { _config, ...controllerMapping } = param.mapping
     this.mapping = controllerMapping
-    this.generatorConfig = _config
+    this.generatorConfig = _config || {}
     this.config = config
   }
   key: string
@@ -83,9 +83,10 @@ export class ControllerGen extends BaseRender {
 
   renderServices() {
     let serviceStr = ""
-    const services = this.mapping[this.key]
-    for (const key in services) {
-      serviceStr += this.renderService(key, services[key]) + "\r"
+    const { _config, ...serviceMapping } = this.mapping[this.key]
+    for (const serviceKey in serviceMapping) {
+      serviceStr +=
+        this.renderService(serviceKey, serviceMapping[serviceKey]) + "\r"
     }
     return serviceStr
   }
@@ -119,9 +120,12 @@ export class ControllerGen extends BaseRender {
         str
       )
 
-      const { _config, serviceMapping } = this.mapping[key]
       new ServiceGen(
-        { key, serviceMapping, generatorConfig: this.generatorConfig, serviceConfig: _config },
+        {
+          key,
+          mapping: this.mapping[key],
+          generatorConfig: this.generatorConfig
+        },
         {
           serviceFolderName: this.config.serviceFolderName,
           contractFolderName: this.config.contractFolderName,
