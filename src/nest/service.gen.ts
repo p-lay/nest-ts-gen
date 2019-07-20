@@ -6,6 +6,7 @@ type Param = {
   model: any
   modelKey: string
   mappingConfig: any
+  modelConfig: ModelConfig
 }
 
 type Config = {
@@ -18,10 +19,9 @@ type Config = {
 export class ServiceGen extends BaseRender {
   constructor(param: Param, config: Config) {
     super()
-    const { model, modelConfig } = this.getModelInfo(param.model)
     this.modelKey = param.modelKey
-    this.model = model
-    this.modelConfig = modelConfig
+    this.model = param.model
+    this.modelConfig = param.modelConfig
     this.mappingConfig = param.mappingConfig
     this.config = config
   }

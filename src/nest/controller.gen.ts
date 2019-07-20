@@ -126,6 +126,7 @@ export class ControllerGen extends BaseRender {
         {
           modelKey,
           model,
+          modelConfig,
           mappingConfig: this.mappingConfig
         },
         {
