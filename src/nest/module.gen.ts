@@ -13,10 +13,6 @@ type Config = {
   entityFolderName: string
 }
 
-type ServiceConfig = {
-  disableEntity: boolean
-}
-
 export class ModuleGen extends BaseRender {
   constructor(param: Param, config: Config) {
     super()
@@ -53,28 +49,6 @@ export class ModuleGen extends BaseRender {
     return [reqType, resType].filter(x => !!x)
   }
 
-  //   renderEntityImports() {
-  //     if (this.serviceConfig.disableEntity) {
-  //       return ""
-  //     } else {
-  //       return `\nimport { InjectRepository } from '@nestjs/typeorm'\nimport { Repository } from 'typeorm'\nimport { ${
-  //         this.entityName
-  //       } } from '../${this.config.entityFolderName}/${this.key}.entity'`
-  //     }
-  //   }
-
-  //   import { AppController } from '../controller/app.controller'
-  // import { VueController } from '../controller/vue.controller'
-  // import { QiniuController } from '../controller/qiniu.controller'
-  // import { UserController } from '../controller/user.controller'
-
-  // export const controllers = [
-  //   AppController,
-  //   VueController,
-  //   QiniuController,
-  //   UserController,
-  // ]
-
   renderModuleController() {
     const controllerNames = []
     let str = ""
@@ -96,8 +70,54 @@ export class ModuleGen extends BaseRender {
     return str
   }
 
+  renderModuleService() {
+    const serviceNames = []
+    let str = ""
+    for (const modelKey in this.mapping) {
+      const { model, modelConfig } = this.getModelInfo(this.mapping[modelKey])
+      const serviceName = this.getServiceName(modelKey)
+      serviceNames.push(serviceName)
+      str += `import { ${serviceName} } from '../${
+        this.config.serviceFolderName
+      }/${modelKey}.service'\n`
+    }
+
+    str += `\nexport const services = [${this.addLine(1)}${serviceNames.join(
+      ", "
+    )}\n]`
+
+    return str
+  }
+
+  renderModuleEntity() {
+    const entityNames = []
+    let str = ""
+    for (const modelKey in this.mapping) {
+      const { model, modelConfig } = this.getModelInfo(this.mapping[modelKey])
+      if (!modelConfig.disableEntity) {
+        const entityName = this.getEntityName(modelKey)
+        entityNames.push(entityName)
+        str += `import { ${entityName} } from '../${
+          this.config.entityFolderName
+        }/${modelKey}.entity'\n`
+      }
+    }
+
+    str += `\nexport const entities = [${this.addLine(1)}${entityNames.join(
+      ", "
+    )}\n]`
+
+    return str
+  }
+
   public generate() {
     const controllerStr = this.renderModuleController()
     fs.writeFileSync(`${this.config.outFolder}/controllers.ts`, controllerStr)
+
+    const serviceStr = this.renderModuleService()
+    fs.writeFileSync(`${this.config.outFolder}/services.ts`, serviceStr)
+
+    const entityStr = this.renderModuleEntity()
+    fs.writeFileSync(`${this.config.outFolder}/entities.ts`, entityStr)
   }
 }
