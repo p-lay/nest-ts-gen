@@ -87,6 +87,10 @@ export class ContractGen extends BaseRender {
   public generate() {
     const mappingType = this.renderMappingType()
     const contractType = this.renderContractType()
+    console.log(
+      "contract generate",
+      this.outFolder + "/" + this.config.outFileName
+    )
     fs.writeFileSync(
       this.outFolder + "/" + this.config.outFileName,
       mappingType + "\r" + contractType

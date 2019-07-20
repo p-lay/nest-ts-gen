@@ -4,8 +4,7 @@ export default {
   },
   vue: {
     addVue: {
-      req: "AddVueReq",
-      res: "any",
+      req: "AddVueReq"
     },
     getVue: {
       req: "GetVueReq",
@@ -17,7 +16,6 @@ export default {
       disableEntity: true
     },
     getQiniuToken: {
-      req: "", // default
       res: "GetQiniuTokenRes"
     }
   },
@@ -26,7 +24,6 @@ export default {
       disableController: true
     },
     getQiniuToken: {
-      req: "", // default
       res: "GetQiniuTokenRes"
     }
   }
