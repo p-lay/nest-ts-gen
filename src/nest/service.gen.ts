@@ -10,7 +10,7 @@ type Param = {
 
 type Config = {
   serviceFolderName: string
-  contractFolderName: string
+  sourceContractFolderRelativePath: string
   entityFolderName: string
   outFolder: string
 }
@@ -74,7 +74,7 @@ export class ServiceGen extends BaseRender {
   renderImports() {
     return `import { Injectable, Inject } from '@nestjs/common'\nimport { ${this.allDtoTypes.join(
       ", "
-    )} } from '../${this.config.contractFolderName}/${
+    )} } from '${this.config.sourceContractFolderRelativePath}/${
       this.modelKey
     }'${this.renderEntityImports()}`
   }

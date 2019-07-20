@@ -9,7 +9,7 @@ type Param = {
 
 type Config = {
   serviceFolderName: string
-  contractFolderName: string
+  sourceContractFolderRelativePath: string
   controllerOutFolder: string
   // for serviceGen
   serviceOutFolder: string
@@ -65,11 +65,11 @@ export class ControllerGen extends BaseRender {
       this.serviceName
     } } from '../${this.config.serviceFolderName}/${
       this.modelKey
-    }.service'\nimport { ${this.commonResType} } from '../${
-      this.config.contractFolderName
+    }.service'\nimport { ${this.commonResType} } from '${
+      this.config.sourceContractFolderRelativePath
     }/${this.globalTypeFileName}'\nimport { ${this.allDtoTypes.join(
       ", "
-    )} } from '../${this.config.contractFolderName}/${this.modelKey}'`
+    )} } from '${this.config.sourceContractFolderRelativePath}/${this.modelKey}'`
   }
 
   renderClass() {
@@ -130,7 +130,7 @@ export class ControllerGen extends BaseRender {
         },
         {
           serviceFolderName: this.config.serviceFolderName,
-          contractFolderName: this.config.contractFolderName,
+          sourceContractFolderRelativePath: this.config.sourceContractFolderRelativePath,
           outFolder: this.config.serviceOutFolder,
           entityFolderName: this.config.entityFolderName
         }

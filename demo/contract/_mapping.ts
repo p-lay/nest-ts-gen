@@ -11,7 +11,7 @@ export default {
       res: "GetVueRes"
     }
   },
-  noEntity: {
+  qiniu: {
     _config: {
       disableEntity: true
     },
@@ -19,12 +19,13 @@ export default {
       res: "GetQiniuTokenRes"
     }
   },
-  noController: {
+  resource: {
     _config: {
       disableController: true
     },
-    getQiniuToken: {
-      res: "GetQiniuTokenRes"
+    getResource: {
+      req: "GetResourceReq",
+      res: "GetResourceRes"
     }
   }
 }

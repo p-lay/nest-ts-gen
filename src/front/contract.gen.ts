@@ -2,13 +2,13 @@ import * as fs from "fs"
 import { BaseRender } from "../baseRender"
 
 type Config = {
-  outFileName: string
+  mappingFileName: string
   typeName: string
 }
 
 type Param = {
   mapping: any
-  outFolder: string
+  outFolderPath: string
   config?: Partial<Config>
 }
 
@@ -18,14 +18,14 @@ export class ContractGen extends BaseRender {
     const { mapping, mappingConfig } = this.getMappingInfo(param.mapping)
     this.mapping = mapping
     this.mappingConfig = mappingConfig
-    this.outFolder = param.outFolder
+    this.outFolder = param.outFolderPath
     const paramConfig = param.config || {}
     this.config = { ...this.defaultConfig, ...paramConfig }
   }
   mapping: any
   outFolder: string
   defaultConfig: Partial<Config> = {
-    outFileName: "mapping.d.ts",
+    mappingFileName: "mapping.d.ts",
     typeName: "ContractType"
   }
   config: Partial<Config>
@@ -87,12 +87,8 @@ export class ContractGen extends BaseRender {
   public generate() {
     const mappingType = this.renderMappingType()
     const contractType = this.renderContractType()
-    console.log(
-      "contract generate",
-      this.outFolder + "/" + this.config.outFileName
-    )
     fs.writeFileSync(
-      this.outFolder + "/" + this.config.outFileName,
+      this.outFolder + "/" + this.config.mappingFileName,
       mappingType + "\r" + contractType
     )
   }

@@ -2,7 +2,8 @@ export interface NestParam {
   mapping: any
   rootFolderPath: string
   serviceFolderName: string
-  contractFolderName: string
+  // the path related to output file path
+  sourceContractFolderRelativePath: string
   controllerFolderName: string
   entityFolderName: string
   moduleFolderName: string
@@ -10,7 +11,6 @@ export interface NestParam {
 
 export interface FrontParam {
   mapping: any
-  rootFolderPath: string
-  typeFolderName: string
+  outFolderPath: string
   sourceContractFolderPath: string
 }

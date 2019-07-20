@@ -10,7 +10,7 @@ export function generateNest(param: NestParam) {
   const {
     mapping,
     serviceFolderName,
-    contractFolderName,
+    sourceContractFolderRelativePath,
     rootFolderPath,
     controllerFolderName,
     entityFolderName,
@@ -22,7 +22,7 @@ export function generateNest(param: NestParam) {
     },
     {
       serviceFolderName,
-      contractFolderName,
+      sourceContractFolderRelativePath,
       controllerOutFolder: join(rootFolderPath, controllerFolderName),
       // for serviceGen
       serviceOutFolder: join(rootFolderPath, serviceFolderName),
@@ -42,19 +42,11 @@ export function generateNest(param: NestParam) {
 }
 
 export function generateFront(param: FrontParam) {
-  const {
-    mapping,
-    rootFolderPath,
-    typeFolderName,
-    sourceContractFolderPath
-  } = param
+  const { mapping, outFolderPath, sourceContractFolderPath } = param
   new ContractGen({
     mapping,
-    outFolder: join(rootFolderPath, typeFolderName)
+    outFolderPath
   }).generate()
 
-  new DefinitionGen(
-    sourceContractFolderPath,
-    join(rootFolderPath, typeFolderName)
-  ).generate()
+  new DefinitionGen(sourceContractFolderPath, outFolderPath).generate()
 }

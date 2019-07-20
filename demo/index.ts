@@ -13,15 +13,14 @@ const moduleFolderName = "module"
 
 generateFront({
   mapping,
-  rootFolderPath: join(__dirname, "output/front"),
-  typeFolderName,
   sourceContractFolderPath: join(__dirname, "contract"),
+  outFolderPath: join(__dirname, "output/front", typeFolderName)
 })
 
 generateNest({
   mapping,
   rootFolderPath: join(__dirname, "output/nest"),
-  contractFolderName,
+  sourceContractFolderRelativePath: "../../../contract",
   serviceFolderName,
   controllerFolderName,
   entityFolderName,
