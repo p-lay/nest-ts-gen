@@ -1,11 +1,4 @@
-export type MappingConfig = {
-  promiseGenericRes: string
-}
-
-export type ModelConfig = {
-  disableEntity: boolean
-  disableController: boolean
-}
+import { MappingConfig, ModelConfig, MethodConfig, Model, Method } from "./type/global"
 
 export class BaseRender {
   mappingConfig: MappingConfig
@@ -52,6 +45,30 @@ export class BaseRender {
       return "Promise<any>"
     } else {
       return `Promise<${str}>`
+    }
+  }
+
+  getMappingInfo(rawMapping: any) {
+    const { _config, ...mapping } = rawMapping
+    return {
+      mappingConfig: (_config || {}) as MappingConfig,
+      mapping
+    }
+  }
+
+  getModelInfo(rawModel: Model) {
+    const { _config, ...model } = rawModel
+    return {
+      modelConfig: (_config || {}) as ModelConfig,
+      model
+    }
+  }
+
+  getMethodInfo(rawMethod: Method) {
+    const { _config, ...method } = rawMethod as any
+    return {
+      methodConfig: (_config || {}) as MethodConfig,
+      method
     }
   }
 }

@@ -15,9 +15,9 @@ type Param = {
 export class ContractGen extends BaseRender {
   constructor(param: Param) {
     super()
-    const { _config, ...mapping } = param.mapping
+    const { mapping, mappingConfig } = this.getMappingInfo(param.mapping)
     this.mapping = mapping
-    this.mappingConfig = _config
+    this.mappingConfig = mappingConfig
     this.outFolder = param.outFolder
     const paramConfig = param.config || {}
     this.config = { ...this.defaultConfig, ...paramConfig }
@@ -37,9 +37,7 @@ export class ContractGen extends BaseRender {
   private renderModels() {
     let modelStr = ""
     for (const modelKey in this.mapping) {
-      modelStr += `${this.addLine(
-        1
-      )}${modelKey}: {${this.renderMethods(
+      modelStr += `${this.addLine(1)}${modelKey}: {${this.renderMethods(
         this.mapping[modelKey]
       )}${this.addLine(1)}}`
     }
@@ -47,7 +45,7 @@ export class ContractGen extends BaseRender {
   }
 
   private renderMethods(mapping: any) {
-    const { _config, ...model } = mapping
+    const { model } = this.getModelInfo(mapping)
     let methodStr = ""
     for (const methodKey in model) {
       methodStr += `${this.addLine(2)}${methodKey}: {${this.renderMethod(
@@ -58,7 +56,7 @@ export class ContractGen extends BaseRender {
   }
 
   private renderMethod(mapping: any) {
-    const { _config, ...method } = mapping
+    const { method } = this.getMethodInfo(mapping)
     let dtoStr = ""
     const keys = Object.keys(method)
     let reqTypeStr = method.req

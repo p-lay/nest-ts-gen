@@ -1,6 +1,6 @@
 import * as fs from "fs"
-import { BaseRender, ModelConfig } from "../baseRender"
-import { Method } from "../type/global"
+import { BaseRender } from "../baseRender"
+import { Method, ModelConfig } from "../type/global"
 
 type Param = {
   model: any
@@ -18,10 +18,10 @@ type Config = {
 export class ServiceGen extends BaseRender {
   constructor(param: Param, config: Config) {
     super()
-    const { _config, ...model } = param.model
+    const { model, modelConfig } = this.getModelInfo(param.model)
     this.modelKey = param.modelKey
     this.model = model
-    this.modelConfig = _config || {}
+    this.modelConfig = modelConfig
     this.mappingConfig = param.mappingConfig
     this.config = config
   }
@@ -72,9 +72,11 @@ export class ServiceGen extends BaseRender {
   }
 
   renderImports() {
-    return `import { Injectable, Inject } from '@nestjs/common'\nimport { ${this.allDtoTypes.join(", ")} } from '../${
-      this.config.contractFolderName
-    }/${this.modelKey}'${this.renderEntityImports()}`
+    return `import { Injectable, Inject } from '@nestjs/common'\nimport { ${this.allDtoTypes.join(
+      ", "
+    )} } from '../${this.config.contractFolderName}/${
+      this.modelKey
+    }'${this.renderEntityImports()}`
   }
 
   renderConstructor() {
@@ -99,8 +101,7 @@ export class ServiceGen extends BaseRender {
   renderMethods() {
     let methodStr = ""
     for (const methodKey in this.model) {
-      methodStr +=
-        this.renderMethod(methodKey, this.model[methodKey]) + "\r"
+      methodStr += this.renderMethod(methodKey, this.model[methodKey]) + "\r"
     }
     return methodStr
   }
@@ -108,7 +109,9 @@ export class ServiceGen extends BaseRender {
   renderMethod(methodKey: string, method: Method) {
     return `${this.addLine(1)}async ${methodKey}(param: ${this.getRequestType(
       method.req
-    )}): ${this.getServiceResponseType(method.res)} {${this.addLine(2)}return null${this.addLine(1)}}`
+    )}): ${this.getServiceResponseType(method.res)} {${this.addLine(
+      2
+    )}return null${this.addLine(1)}}`
   }
 
   renderClassDecorator() {
@@ -121,6 +124,9 @@ export class ServiceGen extends BaseRender {
 
   public generate() {
     const str = this.render()
-    fs.writeFileSync(`${this.config.outFolder}/${this.modelKey}.service.ts`, str)
+    fs.writeFileSync(
+      `${this.config.outFolder}/${this.modelKey}.service.ts`,
+      str
+    )
   }
 }

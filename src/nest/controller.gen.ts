@@ -19,9 +19,9 @@ type Config = {
 export class ControllerGen extends BaseRender {
   constructor(param: Param, config: Config) {
     super()
-    const { _config, ...mapping } = param.mapping
+    const { mapping, mappingConfig } = this.getMappingInfo(param.mapping)
     this.mapping = mapping
-    this.mappingConfig = _config || {}
+    this.mappingConfig = mappingConfig
     this.config = config
   }
   modelKey: string
@@ -83,10 +83,9 @@ export class ControllerGen extends BaseRender {
 
   renderMethods() {
     let methodStr = ""
-    const { _config, ...model } = this.mapping[this.modelKey]
+    const { model } = this.getModelInfo(this.mapping[this.modelKey])
     for (const methodKey in model) {
-      methodStr +=
-        this.renderMethod(methodKey, model[methodKey]) + "\r"
+      methodStr += this.renderMethod(methodKey, model[methodKey]) + "\r"
     }
     return methodStr
   }
@@ -113,9 +112,8 @@ export class ControllerGen extends BaseRender {
 
   public generate() {
     for (const modelKey in this.mapping) {
-      const model = this.mapping[modelKey]
-      const disableController = model._config && model._config.disableController
-      if (!disableController) {
+      const { model, modelConfig } = this.getModelInfo(this.mapping[modelKey])
+      if (!modelConfig.disableController) {
         this.modelKey = modelKey
         const str = this.render()
         fs.writeFileSync(
