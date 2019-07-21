@@ -1,6 +1,6 @@
 {
   "name": "nest-ts-code-gen",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "a code generator to generate nest template files and typescript definition files",
   "main": "lib/index.js",
   "module": "es/index.js",

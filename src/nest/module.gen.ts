@@ -2,11 +2,11 @@ import * as fs from "fs"
 import { BaseRender } from "../baseRender"
 import { Method, Model } from "../type/global"
 
-type Param = {
+export type Param = {
   mapping: any
 }
 
-type Config = {
+export type Config = {
   outFolder: string
   controllerFolderName: string
   serviceFolderName: string

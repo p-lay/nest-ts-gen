@@ -1,9 +1,9 @@
 import { BaseRender } from "../baseRender";
 import { Method } from "../type/global";
-declare type Param = {
+export declare type Param = {
     mapping: any;
 };
-declare type Config = {
+export declare type Config = {
     serviceFolderName: string;
     sourceContractFolderRelativePath: string;
     controllerOutFolder: string;
@@ -28,4 +28,3 @@ export declare class ControllerGen extends BaseRender {
     render(): string;
     generate(): void;
 }
-export {};

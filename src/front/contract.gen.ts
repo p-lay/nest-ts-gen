@@ -1,12 +1,13 @@
 import * as fs from "fs"
 import { BaseRender } from "../baseRender"
+import { Model, Method } from "../type/global"
 
-type Config = {
+export type Config = {
   mappingFileName: string
   typeName: string
 }
 
-type Param = {
+export type Param = {
   mapping: any
   outFolderPath: string
   config?: Partial<Config>
@@ -37,26 +38,28 @@ export class ContractGen extends BaseRender {
   private renderModels() {
     let modelStr = ""
     for (const modelKey in this.mapping) {
+      const { model, modelConfig } = this.getModelInfo(this.mapping[modelKey])
+      if (modelConfig.disableController) continue
+
       modelStr += `${this.addLine(1)}${modelKey}: {${this.renderMethods(
-        this.mapping[modelKey]
+        model
       )}${this.addLine(1)}}`
     }
     return modelStr
   }
 
-  private renderMethods(mapping: any) {
-    const { model } = this.getModelInfo(mapping)
+  private renderMethods(model: Model) {
     let methodStr = ""
     for (const methodKey in model) {
+      const { method } = this.getMethodInfo(model[methodKey])
       methodStr += `${this.addLine(2)}${methodKey}: {${this.renderMethod(
-        model[methodKey]
+        method
       )}${this.addLine(2)}}`
     }
     return methodStr
   }
 
-  private renderMethod(mapping: any) {
-    const { method } = this.getMethodInfo(mapping)
+  private renderMethod(method: Method) {
     let dtoStr = ""
     const keys = Object.keys(method)
     let reqTypeStr = method.req
@@ -78,9 +81,12 @@ export class ContractGen extends BaseRender {
   }
 
   private renderContractType() {
-    const controllers = Object.keys(this.mapping).map(
-      controller => `Mapping['${controller}']`
-    )
+    const controllers = Object.keys(this.mapping)
+      .filter(modelKey => {
+        const { modelConfig } = this.getModelInfo(this.mapping[modelKey])
+        return !modelConfig.disableController
+      })
+      .map(controller => `Mapping['${controller}']`)
     return `type ${this.config.typeName} = ${controllers.join(" & ")}`
   }
 

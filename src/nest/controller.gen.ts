@@ -3,11 +3,11 @@ import { BaseRender } from "../baseRender"
 import { Method } from "../type/global"
 import { ServiceGen } from "./service.gen"
 
-type Param = {
+export type Param = {
   mapping: any
 }
 
-type Config = {
+export type Config = {
   serviceFolderName: string
   sourceContractFolderRelativePath: string
   controllerOutFolder: string

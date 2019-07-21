@@ -2,14 +2,14 @@ import * as fs from "fs"
 import { BaseRender } from "../baseRender"
 import { Method, ModelConfig } from "../type/global"
 
-type Param = {
+export type Param = {
   model: any
   modelKey: string
   mappingConfig: any
   modelConfig: ModelConfig
 }
 
-type Config = {
+export type Config = {
   serviceFolderName: string
   sourceContractFolderRelativePath: string
   sourceEntityFolderRelativePath: string

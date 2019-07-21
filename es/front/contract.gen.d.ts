@@ -1,9 +1,9 @@
 import { BaseRender } from "../baseRender";
-declare type Config = {
+export declare type Config = {
     mappingFileName: string;
     typeName: string;
 };
-declare type Param = {
+export declare type Param = {
     mapping: any;
     outFolderPath: string;
     config?: Partial<Config>;
@@ -21,4 +21,3 @@ export declare class ContractGen extends BaseRender {
     private renderContractType;
     generate(): void;
 }
-export {};

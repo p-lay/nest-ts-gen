@@ -1,12 +1,12 @@
 import { BaseRender } from "../baseRender";
 import { Method, ModelConfig } from "../type/global";
-declare type Param = {
+export declare type Param = {
     model: any;
     modelKey: string;
     mappingConfig: any;
     modelConfig: ModelConfig;
 };
-declare type Config = {
+export declare type Config = {
     serviceFolderName: string;
     sourceContractFolderRelativePath: string;
     sourceEntityFolderRelativePath: string;
@@ -36,4 +36,3 @@ export declare class ServiceGen extends BaseRender {
     replace(str: string): string;
     generate(): void;
 }
-export {};
