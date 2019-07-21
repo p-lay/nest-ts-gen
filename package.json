@@ -3,6 +3,7 @@
   "version": "1.0.1",
   "description": "a code generator to generate nest template files and typescript definition files",
   "main": "lib/index.js",
+  "module": "es/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "demo": "ts-node demo/index.ts",

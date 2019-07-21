@@ -11,7 +11,7 @@
     "target": "es6",
     "outDir": "./dist",
     "baseUrl": "./src",
-    "declaration": false
+    "declaration": true
   },
-  "exclude": ["node_modules", "demo", "lib"]
+  "exclude": ["node_modules", "demo", "lib", "es"]
 }
