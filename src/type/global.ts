@@ -1,5 +1,6 @@
 export interface MappingConfig {
   promiseGenericRes: string
+  paramName?: string
 }
 
 export interface ModelConfig {

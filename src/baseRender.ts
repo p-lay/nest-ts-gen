@@ -1,7 +1,28 @@
-import { MappingConfig, ModelConfig, MethodConfig, Model, Method } from "./type/global"
+import {
+  MappingConfig,
+  ModelConfig,
+  MethodConfig,
+  Model,
+  Method
+} from "./type/global"
 
 export class BaseRender {
-  mappingConfig: MappingConfig
+  _mappingConfig: MappingConfig
+
+  set mappingConfig(config: MappingConfig) {
+    this._mappingConfig = (config || {}) as any
+    // default value
+    if (!this._mappingConfig.paramName) {
+      this._mappingConfig.paramName = "param"
+    }
+    if (!this._mappingConfig.promiseGenericRes) {
+      throw "set mapping config: promiseGenericRes first"
+    }
+  }
+
+  get mappingConfig() {
+    return this._mappingConfig
+  }
 
   addLine(tabCount?: number) {
     let space = ""

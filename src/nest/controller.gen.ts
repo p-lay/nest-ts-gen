@@ -93,11 +93,11 @@ export class ControllerGen extends BaseRender {
   renderMethod(key: string, method: Method) {
     return `${this.addLine(1)}@Post('${key}')${this.addLine(
       1
-    )}async ${key}(@Body() param: ${this.getRequestType(
+    )}async ${key}(@Body() ${this.mappingConfig.paramName}: ${this.getRequestType(
       method.req
     )}): ${this.getControllerResponseType(method.res)} {${this.addLine(
       2
-    )}const data = await this.service.${key}(param)${this.addLine(
+    )}const data = await this.service.${key}(${this.mappingConfig.paramName})${this.addLine(
       2
     )}return {${this.addLine(3)}data,${this.addLine(2)}}${this.addLine(1)}}`
   }

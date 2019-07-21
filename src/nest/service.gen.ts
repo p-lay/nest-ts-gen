@@ -61,13 +61,31 @@ export class ServiceGen extends BaseRender {
     return [reqType, resType].filter(x => !!x)
   }
 
+  replaceMethodHeader(str: string, methodKey: string, method: Method) {
+    // async method\(([\n\s]+)?param: \w+([,\n\s]+)?\): Promise<\w+> {
+    const regExp = new RegExp(
+      `async ${methodKey}\\(([\\n\\s]+)?${
+        this.mappingConfig.paramName
+      }: \\w+([,\\n\\s]+)?\\): Promise<\\w+> {`
+    )
+    const targetMethodHeader = `async ${methodKey}(${
+      this.mappingConfig.paramName
+    }: ${this.getRequestType(method.req)}): ${this.getServiceResponseType(
+      method.res
+    )} {`
+
+    return str.replace(regExp, targetMethodHeader)
+  }
+
   renderEntityImports() {
     if (this.modelConfig.disableEntity) {
       return ""
     } else {
       return `\nimport { InjectRepository } from '@nestjs/typeorm'\nimport { Repository } from 'typeorm'\nimport { ${
         this.entityName
-      } } from '${this.config.sourceEntityFolderRelativePath}/${this.modelKey}.entity'`
+      } } from '${this.config.sourceEntityFolderRelativePath}/${
+        this.modelKey
+      }.entity'`
     }
   }
 
@@ -107,11 +125,11 @@ export class ServiceGen extends BaseRender {
   }
 
   renderMethod(methodKey: string, method: Method) {
-    return `${this.addLine(1)}async ${methodKey}(param: ${this.getRequestType(
-      method.req
-    )}): ${this.getServiceResponseType(method.res)} {${this.addLine(
-      2
-    )}return null${this.addLine(1)}}`
+    return `${this.addLine(1)}async ${methodKey}(${
+      this.mappingConfig.paramName
+    }: ${this.getRequestType(method.req)}): ${this.getServiceResponseType(
+      method.res
+    )} {${this.addLine(2)}return null${this.addLine(1)}}`
   }
 
   renderClassDecorator() {
@@ -122,11 +140,28 @@ export class ServiceGen extends BaseRender {
     return `${this.renderImports()}\n\n${this.renderClass()}`
   }
 
+  replace(str: string) {
+    let targetStr = str
+    for (const methodKey in this.model) {
+      const methodInfo = this.getMethodInfo(this.model[methodKey])
+      targetStr = this.replaceMethodHeader(
+        targetStr,
+        methodKey,
+        methodInfo.method
+      )
+    }
+    return targetStr
+  }
+
   public generate() {
-    const str = this.render()
-    fs.writeFileSync(
-      `${this.config.outFolder}/${this.modelKey}.service.ts`,
-      str
-    )
+    const outputFile = `${this.config.outFolder}/${this.modelKey}.service.ts`
+    if (fs.existsSync(outputFile)) {
+      const str = fs.readFileSync(outputFile).toString()
+      const result = this.replace(str)
+      fs.writeFileSync(outputFile, result)
+    } else {
+      const str = this.render()
+      fs.writeFileSync(outputFile, str)
+    }
   }
 }
