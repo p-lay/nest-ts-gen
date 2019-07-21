@@ -77,6 +77,19 @@ export class ServiceGen extends BaseRender {
     return str.replace(regExp, targetMethodHeader)
   }
 
+  replaceImports(str: string) {
+    const regExp = new RegExp(
+      `import {[\\w\\s,]+} from ['"]${
+        this.config.sourceContractFolderRelativePath
+      }/${this.modelKey}['"]`
+    )
+    const targetImports = `import { ${this.allDtoTypes.join(", ")} } from '${
+      this.config.sourceContractFolderRelativePath
+    }/${this.modelKey}'`
+
+    return str.replace(regExp, targetImports)
+  }
+
   renderEntityImports() {
     if (this.modelConfig.disableEntity) {
       return ""
@@ -141,7 +154,7 @@ export class ServiceGen extends BaseRender {
   }
 
   replace(str: string) {
-    let targetStr = str
+    let targetStr = this.replaceImports(str)
     for (const methodKey in this.model) {
       const methodInfo = this.getMethodInfo(this.model[methodKey])
       targetStr = this.replaceMethodHeader(
