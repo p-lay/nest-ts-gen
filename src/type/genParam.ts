@@ -1,12 +1,13 @@
 export interface NestParam {
   mapping: any
-  rootFolderPath: string
-  serviceFolderName: string
-  // the path related to output file path
   sourceContractFolderRelativePath: string
-  controllerFolderName: string
-  entityFolderName: string
-  moduleFolderName: string
+  sourceEntityFolderRelativePath: string
+  outFolderInfo: {
+    rootPath: string
+    controllerFolder: string
+    serviceFolder: string
+    moduleFolder: string
+  }
 }
 
 export interface FrontParam {

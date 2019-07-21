@@ -10,7 +10,7 @@ type Config = {
   outFolder: string
   controllerFolderName: string
   serviceFolderName: string
-  entityFolderName: string
+  sourceEntityFolderRelativePath: string
 }
 
 export class ModuleGen extends BaseRender {
@@ -97,8 +97,8 @@ export class ModuleGen extends BaseRender {
       if (!modelConfig.disableEntity) {
         const entityName = this.getEntityName(modelKey)
         entityNames.push(entityName)
-        str += `import { ${entityName} } from '../${
-          this.config.entityFolderName
+        str += `import { ${entityName} } from '${
+          this.config.sourceEntityFolderRelativePath
         }/${modelKey}.entity'\n`
       }
     }

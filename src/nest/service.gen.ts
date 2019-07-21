@@ -12,7 +12,7 @@ type Param = {
 type Config = {
   serviceFolderName: string
   sourceContractFolderRelativePath: string
-  entityFolderName: string
+  sourceEntityFolderRelativePath: string
   outFolder: string
 }
 
@@ -67,7 +67,7 @@ export class ServiceGen extends BaseRender {
     } else {
       return `\nimport { InjectRepository } from '@nestjs/typeorm'\nimport { Repository } from 'typeorm'\nimport { ${
         this.entityName
-      } } from '../${this.config.entityFolderName}/${this.modelKey}.entity'`
+      } } from '${this.config.sourceEntityFolderRelativePath}/${this.modelKey}.entity'`
     }
   }
 

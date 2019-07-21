@@ -6,7 +6,7 @@
 
 1. `contract/`: write back-end type and controller mapping configuration in the contract folder
 2. setup codeGen in your code: setup mapping, output folder and output file name
-3. `mkdir` your all output folder, make sure it exist
+3. `mkdir` all your output folder, make sure it exist
 
 #### notification
 

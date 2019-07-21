@@ -9,34 +9,31 @@ import { DefinitionGen } from "./front/definition.gen"
 export function generateNest(param: NestParam) {
   const {
     mapping,
-    serviceFolderName,
     sourceContractFolderRelativePath,
-    rootFolderPath,
-    controllerFolderName,
-    entityFolderName,
-    moduleFolderName
+    sourceEntityFolderRelativePath,
+    outFolderInfo: { rootPath, controllerFolder, serviceFolder, moduleFolder }
   } = param
   new ControllerGen(
     {
       mapping
     },
     {
-      serviceFolderName,
+      serviceFolderName: serviceFolder,
       sourceContractFolderRelativePath,
-      controllerOutFolder: join(rootFolderPath, controllerFolderName),
+      controllerOutFolder: join(rootPath, controllerFolder),
       // for serviceGen
-      serviceOutFolder: join(rootFolderPath, serviceFolderName),
-      entityFolderName
+      serviceOutFolder: join(rootPath, serviceFolder),
+      sourceEntityFolderRelativePath
     }
   ).generate()
 
   new ModuleGen(
     { mapping },
     {
-      controllerFolderName,
-      serviceFolderName,
-      entityFolderName,
-      outFolder: join(rootFolderPath, moduleFolderName)
+      controllerFolderName: controllerFolder,
+      serviceFolderName: serviceFolder,
+      sourceEntityFolderRelativePath,
+      outFolder: join(rootPath, moduleFolder)
     }
   ).generate()
 }

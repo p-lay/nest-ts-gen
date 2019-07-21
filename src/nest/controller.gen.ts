@@ -13,7 +13,7 @@ type Config = {
   controllerOutFolder: string
   // for serviceGen
   serviceOutFolder: string
-  entityFolderName: string
+  sourceEntityFolderRelativePath: string
 }
 
 export class ControllerGen extends BaseRender {
@@ -133,7 +133,7 @@ export class ControllerGen extends BaseRender {
           serviceFolderName: this.config.serviceFolderName,
           sourceContractFolderRelativePath: this.config.sourceContractFolderRelativePath,
           outFolder: this.config.serviceOutFolder,
-          entityFolderName: this.config.entityFolderName
+          sourceEntityFolderRelativePath: this.config.sourceEntityFolderRelativePath
         }
       ).generate()
     }
