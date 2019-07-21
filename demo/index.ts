@@ -1,5 +1,5 @@
 import mapping from "./contract/_mapping"
-import { generateNest, generateFront } from "../src/main"
+import { generateNest, generateFront } from "../dist"
 import { join } from "path"
 
 generateFront({

@@ -10,7 +10,8 @@
     "experimentalDecorators": true,
     "target": "es6",
     "outDir": "./dist",
-    "baseUrl": "./"
+    "baseUrl": "./src",
+    "declaration": true
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "demo"]
 }
