@@ -2,7 +2,7 @@
   "name": "nest-ts-gen",
   "version": "1.0.0",
   "description": "generate nest files and .d.ts files by one mapping file",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "demo": "ts-node demo/index.ts",
