@@ -10,8 +10,10 @@ generateFront({
 
 generateNest({
   mapping,
-  sourceContractFolderRelativePath: "../../../contract",
-  sourceEntityFolderRelativePath: "../entity",
+  // the relative contract folder path in template import expression => import { CommonRes } from '../../../contract/global'
+  sourceContractFolderRelativePath: "../../../contract", 
+  // the relative entity path in template import expression => import { UserEntity } from '../entity/user.entity'
+  sourceEntityFolderRelativePath: "../entity", 
   // out folder must in the same level
   outFolderInfo: {
     rootPath: join(__dirname, "output/nest"),
